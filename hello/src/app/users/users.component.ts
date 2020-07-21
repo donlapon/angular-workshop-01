@@ -1,51 +1,45 @@
+import { User } from './../models/user';
 import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.css']
+  styleUrls: ['./users.component.css'],
 })
 export class UsersComponent implements OnInit {
-
-  firstName = '';
-  lastName ='';
-  name = '';
-  users = []; //Array
+  users: User[] = []; // Array
   show = true;
-  count = 0;
-  checkedUser = 0;
+  selected = 0;
+  submitted = false;
 
-  inputYourName(event: any): void{
-    this.firstName = event.target.value;
-  }
-
-  inputLastName(input: string): void{
-    this.lastName = input;
-  }
-
-  toggle(index: number){
-    if(!this.users[index].checkedUser){
-      this.checkedUser = this.checkedUser+1;
-    }
-    else{
-      this.checkedUser = this.checkedUser-1;
-    }
-    this.users[index].checkedUser = !this.users[index].checkedUser
-  }
-
-  saveData(): void{
-    if (this.firstName == null || this.firstName.trim() === ''){
-      return
-    }
-    this.name = `${this.firstName} ${this.lastName}`;
-    this.users.push({title: this.name, checkedUser: false});
-    this.count++;
-  
-  }
-
+  loginForm: FormGroup;
+  constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
-    
+    this.loginForm = this.formBuilder.group({
+      firstName: ['', [Validators.required, Validators.maxLength(20)]],
+      lastName: ['', Validators.required],
+    });
   }
 
+  get f() {
+    return this.loginForm.controls;
+  }
+
+  saveData(): void {
+    this.submitted = true;
+    if (this.loginForm.invalid) {
+      return;
+    }
+    const fullName = `${this.f.firstName.value} ${this.f.lastName.value}`;
+
+    const user = new User(fullName, false);
+    this.users.push(user);
+  }
+
+  onSelect(index: number): void {
+    this.users[index].status = !this.users[index].status;
+    this.selected = this.users.filter((u) => u.status).length;
+  }
 }

@@ -1,7 +1,6 @@
-.cross {
+li:hover {
+    cursor: pointer;
+  }
+  li.selected {
     text-decoration: line-through;
-}
-
-.uncross {
-    text-decoration: none;
-}
+  }
